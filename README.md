@@ -39,11 +39,6 @@ Each timesheet entry should include:
 - Implemented in **C# (.NET 6 or later)**.
 - Include a **front-end** using either **Razor** or **Blazor** to enable testing of user interactions.
 - Focus on clean, maintainable, and well-structured code.
-
----
-
-### Optional stretch requirement (for senior-level candidates)
-
 - Prevent duplicate entries for the same user, project, and date.
 
 ---

@@ -1,0 +1,155 @@
+﻿@page "/Timesheet"
+@model Timesheet.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "Timesheet";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <h1 class="fw-bold text-primary">🕒 Timesheet Tracker</h1>
+        <p class="text-muted">Add, view, and manage your weekly timesheet entries</p>
+    </div>
+
+    @* Alerts *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Timesheet Form -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        @(Model.IsEditing ? "Edit Entry" : "Add Entry")
+                    </h5>
+                    <form method="post" asp-page-handler="AddOrUpdateEntry">
+                        <div class="mb-3">
+                            <label class="form-label">User ID</label>
+                            <input asp-for="NewEntry.UserId" class="form-control" type="number" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Project ID</label>
+                            <input asp-for="NewEntry.ProjectId" class="form-control" type="number" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input asp-for="NewEntry.Date" class="form-control" type="date" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hours Worked</label>
+                            <input asp-for="NewEntry.HoursWorked" class="form-control" type="number" step="0.5" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description (optional)</label>
+                            <input asp-for="NewEntry.Description" class="form-control" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            @(Model.IsEditing ? "Update Entry" : "Add Entry")
+                        </button>
+                        @if (Model.IsEditing)
+                        {
+                            <a asp-page="/Timesheet" class="btn btn-secondary w-100 mt-2">Cancel Edit</a>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entries Table -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary mb-3">Entries This Week</h5>
+                    @if (Model.Entries.Any())
+                    {
+                        <table class="table table-hover align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>User</th>
+                                    <th>Project</th>
+                                    <th>Date</th>
+                                    <th>Hours</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var entry in Model.Entries)
+                                {
+                                    <tr class="@(entry.HoursWorked >= 8 ? "table-success" : "table-warning")">
+                                        <td>@entry.UserId</td>
+                                        <td>@entry.ProjectId</td>
+                                        <td>@entry.Date.ToShortDateString()</td>
+                                        <td>@entry.HoursWorked</td>
+                                        <td>@entry.Description</td>
+                                        <td>
+                                            <form method="post" asp-page-handler="EditEntry" class="d-inline">
+                                                <input type="hidden" name="userId" value="@entry.UserId" />
+                                                <input type="hidden" name="projectId" value="@entry.ProjectId" />
+                                                <input type="hidden" name="date" value="@entry.Date.ToString("yyyy-MM-dd")" />
+                                                <button type="submit" class="btn btn-sm btn-warning">Edit</button>
+                                            </form>
+                                            <form method="post" asp-page-handler="DeleteEntry" class="d-inline" onsubmit="return confirm('Delete this entry?');">
+                                                <input type="hidden" name="userId" value="@entry.UserId" />
+                                                <input type="hidden" name="projectId" value="@entry.ProjectId" />
+                                                <input type="hidden" name="date" value="@entry.Date.ToString("yyyy-MM-dd")" />
+                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <!-- Totals by project -->
+                        @if (Model.TotalsByProject.Any())
+                        {
+                            <div class="mt-4">
+                                <h5 class="text-secondary">Total Hours By Project</h5>
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Project ID</th>
+                                            <th>Total Hours</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var kvp in Model.TotalsByProject)
+                                        {
+                                            <tr>
+                                                <td>@kvp.Key</td>
+                                                <td>@kvp.Value</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted text-center p-4">
+                            <em>No entries for this week.</em>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

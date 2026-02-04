@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "Timesheet.Web/1.0.0": {
+        "dependencies": {
+          "Timesheet.Core": "1.0.0"
+        },
+        "runtime": {
+          "Timesheet.Web.dll": {}
+        }
+      },
+      "Timesheet.Core/1.0.0": {
+        "runtime": {
+          "Timesheet.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Timesheet.Web/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Timesheet.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
